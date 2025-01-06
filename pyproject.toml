@@ -1,0 +1,27 @@
+[project]
+name = "smart-support-bot"
+version = "0.1.0"
+description = "Telegram support bot with FastAPI admin backend"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi>=0.115.0",
+    "uvicorn[standard]>=0.30.0",
+    "aiogram>=3.13.0",
+    "sqlalchemy>=2.0.36",
+    "alembic>=1.13.3",
+    "psycopg[binary]>=3.2.3",
+    "pydantic>=2.9.2",
+    "pydantic-settings>=2.6.1",
+    "python-dotenv>=1.0.1",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.3.3",
+    "pytest-asyncio>=0.24.0",
+    "httpx>=0.27.2",
+]
+
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"

@@ -8,9 +8,10 @@ router = Router()
 @router.message(Command("help"))
 async def help_handler(message: Message) -> None:
     await message.answer(
-        "/start - start the bot\n"
-        "/help - show commands\n"
-        "/faq - show faq\n"
-        "/new_ticket - create a new ticket\n"
+        "Available commands:\n\n"
+        "/start - register and open main menu\n"
+        "/help - show this message\n"
+        "/faq - browse common questions\n"
+        "/new_ticket - create a support ticket\n"
         "/my_tickets - show your tickets"
     )

@@ -12,6 +12,9 @@ async def main() -> None:
     settings = get_settings()
     setup_logging(settings.log_level)
 
+    if not settings.bot_token:
+        raise RuntimeError("BOT_TOKEN is not set")
+
     bot = Bot(token=settings.bot_token)
     dp = Dispatcher()
 
@@ -23,4 +26,3 @@ async def main() -> None:
 
 if __name__ == "__main__":
     asyncio.run(main())
-    

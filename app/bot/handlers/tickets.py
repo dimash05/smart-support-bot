@@ -7,9 +7,9 @@ router = Router()
 
 @router.message(Command("new_ticket"))
 async def new_ticket_handler(message: Message) -> None:
-    await message.answer("Ticket creation flow will be added in the next step.")
+    await message.answer("Ticket creation flow will be added next.")
 
 
 @router.message(Command("my_tickets"))
 async def my_tickets_handler(message: Message) -> None:
-    await message.answer("Your tickets list will appear here later.")
+    await message.answer("Your ticket list will be available in the next step.")

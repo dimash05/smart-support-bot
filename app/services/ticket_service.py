@@ -37,3 +37,27 @@ class TicketService:
         )
         result = await self.session.execute(stmt)
         return list(result.scalars().all())
+
+    async def get_all_tickets(self) -> list[Ticket]:
+        stmt = select(Ticket).order_by(Ticket.created_at.desc())
+        result = await self.session.execute(stmt)
+        return list(result.scalars().all())
+
+    async def get_ticket_by_id(self, ticket_id: int) -> Ticket | None:
+        stmt = select(Ticket).where(Ticket.id == ticket_id)
+        result = await self.session.execute(stmt)
+        return result.scalar_one_or_none()
+
+    async def update_ticket_status(
+        self,
+        ticket_id: int,
+        status: TicketStatus,
+    ) -> Ticket | None:
+        ticket = await self.get_ticket_by_id(ticket_id)
+        if ticket is None:
+            return None
+
+        ticket.status = status.value
+        await self.session.commit()
+        await self.session.refresh(ticket)
+        return ticket

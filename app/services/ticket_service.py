@@ -1,9 +1,14 @@
+import logging
+
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.ticket import Ticket
 from app.models.user import User
 from app.utils.enums import TicketStatus
+
+
+logger = logging.getLogger(__name__)
 
 
 class TicketService:
@@ -25,8 +30,15 @@ class TicketService:
             status=TicketStatus.OPEN.value,
         )
         self.session.add(ticket)
-        await self.session.commit()
-        await self.session.refresh(ticket)
+
+        try:
+            await self.session.commit()
+            await self.session.refresh(ticket)
+        except Exception:
+            await self.session.rollback()
+            logger.exception("Failed to create ticket")
+            raise
+
         return ticket
 
     async def get_user_tickets(self, user_id: int) -> list[Ticket]:
@@ -58,6 +70,13 @@ class TicketService:
             return None
 
         ticket.status = status.value
-        await self.session.commit()
-        await self.session.refresh(ticket)
+
+        try:
+            await self.session.commit()
+            await self.session.refresh(ticket)
+        except Exception:
+            await self.session.rollback()
+            logger.exception("Failed to update ticket status", extra={"ticket_id": ticket_id})
+            raise
+
         return ticket

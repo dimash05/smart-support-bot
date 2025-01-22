@@ -1,8 +1,13 @@
+import logging
+
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.faq import FAQEntry
 from app.schemas.faq import FAQCreate, FAQUpdate
+
+
+logger = logging.getLogger(__name__)
 
 
 class FAQService:
@@ -35,8 +40,15 @@ class FAQService:
             is_published=data.is_published,
         )
         self.session.add(entry)
-        await self.session.commit()
-        await self.session.refresh(entry)
+
+        try:
+            await self.session.commit()
+            await self.session.refresh(entry)
+        except Exception:
+            await self.session.rollback()
+            logger.exception("Failed to create FAQ entry")
+            raise
+
         return entry
 
     async def update_entry(self, faq_id: int, data: FAQUpdate) -> FAQEntry | None:
@@ -49,6 +61,12 @@ class FAQService:
         for field_name, value in update_data.items():
             setattr(entry, field_name, value)
 
-        await self.session.commit()
-        await self.session.refresh(entry)
+        try:
+            await self.session.commit()
+            await self.session.refresh(entry)
+        except Exception:
+            await self.session.rollback()
+            logger.exception("Failed to update FAQ entry", extra={"faq_id": faq_id})
+            raise
+
         return entry

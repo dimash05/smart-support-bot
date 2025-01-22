@@ -1,7 +1,12 @@
+import logging
+
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.user import User
+
+
+logger = logging.getLogger(__name__)
 
 
 class UserService:
@@ -25,8 +30,15 @@ class UserService:
             user.username = username
             user.first_name = first_name
             user.last_name = last_name
-            await self.session.commit()
-            await self.session.refresh(user)
+
+            try:
+                await self.session.commit()
+                await self.session.refresh(user)
+            except Exception:
+                await self.session.rollback()
+                logger.exception("Failed to update existing user")
+                raise
+
             return user
 
         user = User(
@@ -36,6 +48,13 @@ class UserService:
             last_name=last_name,
         )
         self.session.add(user)
-        await self.session.commit()
-        await self.session.refresh(user)
+
+        try:
+            await self.session.commit()
+            await self.session.refresh(user)
+        except Exception:
+            await self.session.rollback()
+            logger.exception("Failed to create user")
+            raise
+
         return user

@@ -1,0 +1,40 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:16
+    container_name: smart_support_postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: smart_support_bot
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: Dimas_Programist
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  api:
+    build: .
+    container_name: smart_support_api
+    restart: unless-stopped
+    depends_on:
+      - postgres
+    environment:
+      APP_HOST: 0.0.0.0
+      APP_PORT: 8080
+      API_PREFIX: /api/v1
+      BOT_TOKEN: ${8745770265:AAEJ5FUWUVj2vFJf-qNNn17BIaA3ntaltw8}
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: smart_support_bot
+      DB_USER: postgres
+      DB_PASSWORD: Dimas_Programist
+      DATABASE_URL: postgresql+asyncpg://postgres:Dimas_Programist@postgres:5432/smart_support_bot
+      LOG_LEVEL: INFO
+    ports:
+      - "8080:8080"
+    command: >
+      sh -c "alembic upgrade head &&
+             uvicorn app.api_main:app --host 0.0.0.0 --port 8080"
+
+volumes:
+  postgres_data:
